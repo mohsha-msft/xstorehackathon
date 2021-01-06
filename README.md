@@ -37,6 +37,8 @@ Welcome! We all have been busy at work trying to make the best experiences for o
 |   Compare the performance across DFS endpoint and Blob endpoint for same file	|   2	|   2	|   2	|   2	|
 |   Create a azcopy wrapper to start transfers and listen to job status	|   2	|   3	|   3	|   4	|
 |   Use BlobFuse on WSL2.0 and file bugs (4 points)	|   	|   	|   	|   	|
+|   Create a tool that will help users manage blob versioning (keep/delete/add versions)	|   2	|   3	|   3	|   3	|
+|   Tool/API to copy between blobs and files service (extra credits for preserving metadata/smb info)	|   3	|   3	|   3	|   3	|
 |   	|   	|   	|   	|   	|
 
 ## Rules
