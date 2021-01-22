@@ -39,7 +39,9 @@ Welcome! We all have been busy at work trying to make the best experiences for o
 |   Use BlobFuse on WSL2.0 and file bugs (4 points)	|   	|   	|   	|   	|
 |   Create a tool that will help users manage blob versioning (keep/delete/add versions)	|   2	|   3	|   3	|   3	|
 |   Tool/API to copy between blobs and files service (extra credits for preserving metadata/smb info)	|   3	|   3	|   3	|   3	|
-|   	|   	|   	|   	|   	|
+|   [Write a tool that provides filtering capability using Blob Tags](Tags.md)	|   3	|   3	|   3	|   3	|
+|   [Write a tool that calculates capacity usage of storage account](Capacity.md)	|   3	|   3	|   3	|   3	|
+|   [Throttling challenge](Throttling.md)	|   6	|   6	|   6	|  6	|
 
 ## Rules
 
