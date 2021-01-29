@@ -27,18 +27,18 @@ Welcome! We all have been busy at work trying to make the best experiences for o
 
 | Project	|.Net  	| Java 	| JS 	| Python 	|
 |---	|---	|---	|---	|---	|
-|  List Million Blobs 	|   2	|   2	|  3 	|  3 	|
-|  List Million Blobs in a non-alphabetic randomized order (extra credits for bigger randomizations) 	|   3	|   3	|   3	|   3	|
-|   Azure Function that does LCM at large scale	|   3	|   3	|  3 	|   3	|
-|   Setup AAD and use it to transfer data from one account to another	|   3	|   3	|   3	|   3	|
-|   Download PageBlob ignoring pages that are empty	|   4	|   4	|   4	|   4	|
-|   Copy a VHD from one account to another	|   3	|   3	|   3	|   3	|
-|   Using Batch API delete all the data in your account with error handling	|   2	|   2	|   2	|   2	|
-|   Compare the performance across DFS endpoint and Blob endpoint for same file	|   2	|   2	|   2	|   2	|
-|   Create a azcopy wrapper to start transfers and listen to job status	|   2	|   3	|   3	|   4	|
-|   Use BlobFuse on WSL2.0 and file bugs (4 points)	|   	|   	|   	|   	|
-|   Create a tool that will help users manage blob versioning (keep/delete/add versions)	|   2	|   3	|   3	|   3	|
-|   Tool/API to copy between blobs and files service (extra credits for preserving metadata/smb info)	|   3	|   3	|   3	|   3	|
+|  [List Million Blobs](ListMillion.md) 	|   2	|   2	|  3 	|  3 	|
+|  [List Million Blobs in a non-alphabetic randomized order (extra credits for bigger randomizations)](ListMillionRandom.md) 	|   3	|   3	|   3	|   3	|
+|   [Azure Function that does LCM at large scale](LCMFunction.md)	|   3	|   3	|  3 	|   3	|
+|   [Setup AAD and use it to transfer data from one account to another](AADChallenge.md)	|   3	|   3	|   3	|   3	|
+|   [Download PageBlob ignoring pages that are empty](PageBlobDataSaver.md)	|   4	|   4	|   4	|   4	|
+|   [Copy a VHD from one account to another](PageBlobS2S.md)	|   3	|   3	|   3	|   3	|
+|   [Using Batch API delete all the data in your account with error handling](BatchDelete.md)	|   2	|   2	|   2	|   2	|
+|   [Compare the performance across DFS endpoint and Blob endpoint for same file](Performance.md)	|   2	|   2	|   2	|   2	|
+|   [Create a azcopy wrapper to start transfers and listen to job status](azcopy.md)	|   2	|   3	|   3	|   4	|
+|   [Use BlobFuse on WSL2.0 and file bugs (4 points)](fuse.md)	|   	|   	|   	|   	|
+|   [Create a tool that will help users manage blob versioning (keep/delete/add versions)](Versioning.md)	|   2	|   3	|   3	|   3	|
+|   [Tool/API to copy between blobs and files service (extra credits for preserving metadata/smb info)](S2SChallenge.md)	|   3	|   3	|   3	|   3	|
 |   [Write a tool that provides filtering capability using Blob Tags](Tags.md)	|   3	|   3	|   3	|   3	|
 |   [Write a tool that calculates capacity usage of storage account](Capacity.md)	|   3	|   3	|   3	|   3	|
 |   [Throttling challenge](Throttling.md)	|   6	|   6	|   6	|  6	|
