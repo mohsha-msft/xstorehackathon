@@ -16,7 +16,7 @@ QueueItem = namedtuple("QueueItem", "Container Type ListPath")
 # Type : Block / Page
 
 # Info for each directory for block blob and each page for page blob
-UsageInfo = namedtuple("UsageInfo", "Container Type Folder DirCount FileCount TotalSize Allocated")
+UsageInfo = namedtuple("UsageInfo", "Container Type Folder DirCount FileCount AppendCount PageCount TotalSize Allocated")
 
 # Below is how to use the namedtuple
 #a = BlobInfo(Container="abc", Folder="def", DirCount=5, FileCount=6)
@@ -88,10 +88,34 @@ def SizeCalculator(thrId):
                                 DirCount=dir_count, 
                                 FileCount=file_count, 
                                 TotalSize=total_size,
+                                AppendCount=0,
+                                PageCount=0,
                                 Allocated=0))
 
+        elif queue_item.Type == "Append":
+            UsageSummary.put(UsageInfo(
+                                Container=queue_item.Container, 
+                                Folder=queue_item.ListPath,
+                                Type="Append",
+                                DirCount=0, 
+                                FileCount=0, 
+                                TotalSize=0,
+                                AppendCount=1,
+                                PageCount=0,
+                                Allocated=0))
+        elif queue_item.Type == "Page":
+            UsageSummary.put(UsageInfo(
+                                Container=queue_item.Container, 
+                                Folder=queue_item.ListPath,
+                                Type="Page",
+                                DirCount=0, 
+                                FileCount=0, 
+                                TotalSize=0,
+                                AppendCount=0,
+                                PageCount=1,
+                                Allocated=0))
         else:
-            print("Page blob support to be added here")
+            print("Unsupported Blob Type")
 
 
         PendingList.task_done()
@@ -108,8 +132,10 @@ def ReportUsage():
     page_count = 0
     dir_count = 0
     file_count = 0
-    total_size = 0
+    append_count = 0
     page_count = 0
+
+    total_size = 0
 
     Done = False
     while not Done:
@@ -121,25 +147,42 @@ def ReportUsage():
             continue
 
         usage_item = UsageSummary.get()
-        
-        dir_count += usage_item.DirCount
-        file_count += usage_item.FileCount
-        total_size += usage_item.TotalSize
+        if usage_item.Type == "Block":
+            dir_count += usage_item.DirCount
+            file_count += usage_item.FileCount
+            total_size += usage_item.TotalSize
+        elif usage_item.Type == "Append":
+            append_count += usage_item.AppendCount
+        elif usage_item.Type == "Page":
+            page_count += usage_item.PageCount
         
         #print(usage_item)
         print(".", end ="")
         UsageSummary.task_done()
 
+    # Count the file share items seperatly
+    fileShareStats = Azure.ListFileShares()
+    fileShareUsage = 0
+    for fileShareItem in fileShareStats:
+        fileShareUsage += fileShareStats[fileShareItem]
+        print("#", end ="")
+
     global TotalContainer
     print("")
     print("----------------------------------------------------------------")
-    print("Total Containers   : " + str(TotalContainer))
-    print("Total Directories  : " + str(dir_count))
-    print("Total Files        : " + str(file_count))
-    print("Total Pages        : " + str(page_count))
-    print("Total Data         : " + str(total_size))
+    print("Total Containers        : " + str(TotalContainer))
+    print("Total Directories       : " + str(dir_count))
+    print("Total Block Blobs       : " + str(file_count))
+    print("Total Append Blobs      : " + str(append_count))
+    print("Total Page Blobs        : " + str(page_count))
+    print("Total Data              : " + str(total_size))
+    print("----------------------------------------------------------------")
+    print("Total File Shares       : " + str(len(fileShareStats)))
+    print("Total File Share Usage  : " + str(fileShareUsage))
     print("----------------------------------------------------------------")
     
+    fileShareStats.clear()
+    print("Capacitor is tired... bye bye !!!")    
 
 
 
