@@ -6,6 +6,7 @@ import time
 import sys
 from pathlib import Path
 
+
 import azure_wrapper as Azure
 
 from collections import namedtuple
@@ -29,14 +30,33 @@ StopProcessing = False
 InitialIterationDone = False
 TotalContainer = 0
 
+MaxThreadCount = 8
+IterationRunning = 0
+IteratorLock = threading.Lock()
+
 IteratorPoolList = []
 def SizeCalculator(thrId):
     #print("Child " + str(thrId) + " started")
     global InitialIterationDone
+    global IterationRunning
+    global MaxThreadCount
+
+
+    Done = False
 
     totalPathProcessed = 0
-    while True:
-        queue_item = PendingList.get()
+    while not Done:
+        try:
+            queue_item = PendingList.get(timeout=3)
+        except:
+            if PendingList.empty() and IterationRunning == 0:
+                Done = True
+            continue
+
+        IteratorLock.acquire()
+        IterationRunning += 1
+        IteratorLock.release()
+        
         #print("Iterating path : " + queue_item.Container + ":" + queue_item.ListPath)
         
         totalPathProcessed += 1
@@ -76,7 +96,12 @@ def SizeCalculator(thrId):
 
         PendingList.task_done()
 
-    print("Child " + str(thrId) + " exited : Dir " + str(totalPathProcessed))
+        IteratorLock.acquire()
+        IterationRunning -= 1
+        IteratorLock.release()
+        
+    #print("Child " + str(thrId) + " exited : Dir " + str(totalPathProcessed))
+    MaxThreadCount -= 1
 
 
 def ReportUsage():
@@ -84,16 +109,37 @@ def ReportUsage():
     dir_count = 0
     file_count = 0
     total_size = 0
+    page_count = 0
 
-    while True:
+    Done = False
+    while not Done:
+        try:
+             usage_item = UsageSummary.get(timeout=3)
+        except:
+            if MaxThreadCount == 0:
+                Done = True
+            continue
+
         usage_item = UsageSummary.get()
         
         dir_count += usage_item.DirCount
         file_count += usage_item.FileCount
         total_size += usage_item.TotalSize
         
-        print(usage_item)
+        #print(usage_item)
+        print(".", end ="")
         UsageSummary.task_done()
+
+    global TotalContainer
+    print("")
+    print("----------------------------------------------------------------")
+    print("Total Containers   : " + str(TotalContainer))
+    print("Total Directories  : " + str(dir_count))
+    print("Total Files        : " + str(file_count))
+    print("Total Pages        : " + str(page_count))
+    print("Total Data         : " + str(total_size))
+    print("----------------------------------------------------------------")
+    
 
 
 
@@ -107,13 +153,17 @@ def main(argv):
 
     # Get the list of containers from the storage account
     # Push them to queue for first level of iteration
+    global TotalContainer
     container_list = Azure.ListStorageContainers()
     TotalContainer = len(container_list)
+
+    if TotalContainer == 0:
+        print("There is nothing to iterate in this account")
+        exit()
 
     for container in container_list:
         PendingList.put(QueueItem(Container=container, Type="Block", ListPath=""))
     container_list.clear()
-
 
     # Start the thread to report the usage info
     report_thread = threading.Thread(target=ReportUsage)
@@ -122,7 +172,6 @@ def main(argv):
 
 
     # Start N threads to iteratre the directory and list recursively
-    MaxThreadCount = 8
     for i in range(MaxThreadCount):
         #print("Starting child thread " + str(i))
         t = threading.Thread(target=SizeCalculator,  args=[i])
@@ -133,6 +182,7 @@ def main(argv):
     #StopProcessing = True
     for itr in IteratorPoolList:
         itr.join()
+    report_thread.join()
 
 
 
