@@ -51,14 +51,7 @@ def SizeCalculator(thrId):
                 blob_info = Azure.GetBlobInfo(blob)
                 if blob_info["dir"]:
                     dir_count += 1
-                    next_list_path = ""
-
-                    if queue_item.ListPath == "":
-                        next_list_path = blob_info["name"]
-                    else:
-                        next_list_path = queue_item.ListPath + "/" + blob_info["name"]
-
-                    PendingList.put(QueueItem(Container=queue_item.Container, Type="Block", ListPath=next_list_path))
+                    PendingList.put(QueueItem(Container=queue_item.Container, Type="Block", ListPath=blob_info["name"]))
                 else:
                     file_count += 1
                     total_size += blob_info["size"]
