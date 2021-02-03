@@ -78,6 +78,7 @@ def compute_gen2_storage_size():
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     # azure_storage_account_name, azure_storage_account_key, connection_string = get_credentials()
     # compute_file_storage_size()
     # compute_blob_storage_size()
@@ -88,3 +89,13 @@ if __name__ == '__main__':
     # print("Total Size in Bytes " + str(total_size))
     wrapper.print_hello()
     caw.print_hello()
+=======
+    azure_storage_account_name, azure_storage_account_key, connection_string = get_credentials()
+    compute_file_storage_size()
+    compute_blob_storage_size()
+    print(storage_account_attributes["FILE_SHARE_STATS"])
+    print(storage_account_attributes["BLOB_STATS"])
+    total_size = storage_account_attributes["FILE_SHARE_STATS"]["TOTAL_USAGE"] + \
+                 storage_account_attributes["BLOB_STATS"]["TOTAL_USAGE"]
+    print("Total Size in Bytes " + str(total_size))
+>>>>>>> origin/devex-idc/capacity-problem
