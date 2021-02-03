@@ -5,8 +5,6 @@ from azure.storage.fileshare import ShareServiceClient
 StorageAccountConnectionString = ""
 BlobServiceClientObj = None
 
-#"DefaultEndpointsProtocol=https;AccountName=vikasfuseblob;AccountKey=nzS+/uDQquKMlsIERLtcrFDt8VD159GuGPQJQFFCQ0My/0J8rRknZQP7tpJXF04l9TBbkTwvgZW9aVHcsFtmDg==;EndpointSuffix=core.windows.net"
-
 # Method to set the connection string 
 def SetConnectionString(con_str):
     global StorageAccountConnectionString
