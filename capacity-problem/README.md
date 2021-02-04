@@ -5,6 +5,8 @@
  - Narasimha (Narasimha.Kulkarni@microsoft.com)
  - Mohit (mohsha@microsoft.com)
  
+ ## Input
+ python main.py <connection string to storage account>
  
  ## Output 
  
