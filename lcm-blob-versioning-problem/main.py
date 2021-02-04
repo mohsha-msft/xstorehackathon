@@ -23,20 +23,24 @@ def main(cli_options):
             print(blob_version)
 
     elif cli_options['delete_version']:
-        azure_wrapper.delete_blob_version(cli_options['container'],
+        if azure_wrapper.delete_blob_version(cli_options['container'],
                                           cli_options['blob'],
-                                          cli_options['delete_version'])
-        print("Deleted successfully")
+                                          cli_options['delete_version']) == 0:
+            print("Deleted successfully")
+        else:
+            print("Deletion failed")
 
     elif cli_options['create_version']:
         options = {
             "file_path": cli_options['create_version'],
             "blob_type": cli_options['blob_type'],
         }
-        azure_wrapper.add_blob_version(cli_options['container'],
+        if azure_wrapper.add_blob_version(cli_options['container'],
                                        cli_options['blob'],
-                                       options)
-        print("New version created successfully")
+                                       options) == 0:
+            print("New version created successfully")
+        else:
+            print("New version creation failed")
 
     elif cli_options['get_version']:
         options = {
@@ -46,7 +50,10 @@ def main(cli_options):
         size = azure_wrapper.download_blob_version(cli_options['container'],
                                                    cli_options['blob'],
                                                    options)
-        print("Version downloaded successfully to give file. Size : " + str(size))
+        if size < 0:
+            print("Download failed")
+        else:
+            print("Blob download successful. Size: " + str(size) + "B")
 
     elif cli_options['delete_version_condition']:
         options = {}
@@ -84,7 +91,7 @@ def main(cli_options):
                                                                     options)
         for deleted_version in deleted_versions:
             print(deleted_version)
-        print("Deleted blob versions successfully")
+        print(str(len(deleted_versions)) + " Blob versions deleted")
 
     elif cli_options['set_tier_of_version']:
         options = {
@@ -93,11 +100,12 @@ def main(cli_options):
             'version_id': cli_options['set_tier_of_version']
         }
 
-        azure_wrapper.blob_version_set_tier(cli_options['container'],
+        if azure_wrapper.blob_version_set_tier(cli_options['container'],
                                             cli_options['blob'],
-                                            options)
-
-        print("Blob Version set successfully")
+                                            options) == 0:
+            print("Blob tier updated successfully")
+        else:
+            print("Blob tier update failed")
 
 
 if __name__ == "__main__":

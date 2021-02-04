@@ -5,9 +5,9 @@
  - Narasimha (narasimha.kulkarni@microsoft.com)
  - Mohit (mohsha@microsoft.com)
  
- ## Input
+## Input
  
- Set connection string for the storage account as a part of environment variable: `AZURE_STORAGE_CONNECTION_STRING`
+Set connection string for the storage account as a part of environment variable: `AZURE_STORAGE_CONNECTION_STRING`
  ```
 python main.py [-h] -c CONTAINER -b BLOB [-l | -d DELETE_VERSION | -a CREATE_VERSION | -g GET_VERSION | -x | -e SET_TIER_OF_VERSION] [-t BLOB_TYPE] [-f FILE] [-lt CONDITION_BEFORE_DATE]
                [-gt CONDITION_AFTER_DATE] [-bt] [-tr TIER]
@@ -57,12 +57,15 @@ optional arguments:
   ### Download specific version
  ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/download.png?raw=true)
  
+   ### Set tier on a specific version
+ ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/set_tier.png?raw=true)
+ 
  ### Delete specific version
  ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/delete.png?raw=true)
  
   ### Delete all version with last modified time greater than specified time (inclusive)
  ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/delete_greater_than.png?raw=true)
  
-  ### ### Delete all version with last modified time between specified start and end time ((inclusive))
+  ### Delete all version with last modified time between specified start and end time (inclusive)
  ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/delete_between.png?raw=true)
  

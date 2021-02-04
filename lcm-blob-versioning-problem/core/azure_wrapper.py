@@ -2,6 +2,8 @@ import datetime as dt
 import random
 import string
 import time
+import sys
+import azure.core.exceptions as excpt
 
 from azure.storage.blob import (
     BlobServiceClient,
@@ -84,9 +86,12 @@ def list_blob_versions(_container_name, relative_blob_path):
             }
             blob_versions.append(blob_version)
             # print(blob_version)
-
+    except excpt.HttpResponseError as e:
+        print(e.message)
+    except:
+        e = sys.exc_info()[0]
+        print(e)
     finally:
-        # print("=====================Listing Successful =======================================")
         container_client.close()
 
     return blob_versions
@@ -100,15 +105,21 @@ def delete_blob_version(_container_name, _relative_blob_path, _version_id):
         conn_str=connection_string,
     )
 
+    return_code = -1
     try:
         delete_resp = blob_client.delete_blob(version_id=_version_id)
-        # print(delete_resp)
+        return_code = 0
+    except excpt.HttpResponseError as e:
+        print(e.message)
+    except:
+        e = sys.exc_info()[0]
+        print(e)
 
     finally:
         # print("=====================Delete Successful =======================================")
         blob_client.close()
 
-    return delete_resp
+    return return_code
 
 
 # Create a new version of given blob by uploading the file to that blob
@@ -119,15 +130,21 @@ def add_blob_version(_container_name, _relative_blob_path, options):
         conn_str=connection_string,
     )
 
+    return_code = -1
     try:
         blob_data = open(options["file_path"], 'rb').read()
         upload_resp = blob_client.upload_blob(data=blob_data, blob_type=options["blob_type"], overwrite=True)
-
+        return_code = 0
+    except excpt.HttpResponseError as e:
+        print(e.message)
+    except:
+        e = sys.exc_info()[0]
+        print(e)
     finally:
         # print("=====================New version Added Successful =======================================")
         blob_client.close()
 
-    return upload_resp
+    return return_code
 
 
 # Get specific version of a blob and save contents to given file
@@ -137,16 +154,23 @@ def download_blob_version(_container_name, _relative_blob_path, options):
         blob_name=_relative_blob_path,
         conn_str=connection_string,
     )
-
+    download_resp = None
     try:
         download_resp = blob_client.download_blob(version_id=options["version_id"])
         content = download_resp.readall()
         blob_data = open(options["file_path"], 'wb').write(content)
+        print("Version downloaded successfully to give file. Size : " + str(download_resp.size))
+    except excpt.HttpResponseError as e:
+        print(e.message)
+    except:
+        e = sys.exc_info()[0]
+        print(e)
 
     finally:
         # print("=====================Download Successful =======================================")
         blob_client.close()
-
+    if download_resp is None:
+        return -1
     return download_resp.size
 
 
@@ -158,8 +182,8 @@ def delete_blob_with_condition(_container_name, _relative_blob_path, options):
         conn_str=connection_string,
     )
 
+    delete_total_resp = []
     try:
-        delete_total_resp = []
         blob_versions = list_blob_versions(_container_name, _relative_blob_path)
 
         if 'delete_before' in options:
@@ -181,6 +205,11 @@ def delete_blob_with_condition(_container_name, _relative_blob_path, options):
                     delete_resp = blob_client.delete_blob(version_id=blob_version["version_id"])
                     delete_total_resp.append(blob_version)
 
+    except excpt.HttpResponseError as e:
+        print(e.message)
+    except:
+        e = sys.exc_info()[0]
+        print(e)
     finally:
         blob_client.close()
 
@@ -195,8 +224,10 @@ def blob_version_set_tier(_container_name, _relative_blob_path, options):
         conn_str=connection_string,
     )
 
+    set_tier_resp = None
+    return_code = -1
     try:
-        set_tier_resp = None
+
         if options["blob_type"] == "BlockBlob":
             set_tier_resp = blob_client.set_standard_blob_tier(standard_blob_tier=options["tier"],
                                                                version_id=options["version_id"])
@@ -204,8 +235,14 @@ def blob_version_set_tier(_container_name, _relative_blob_path, options):
             set_tier_resp = blob_client.set_premium_page_blob_tier(premium_page_blob_tier=options["tier"],
                                                                    version_id=options["version_id"])
 
+        return_code = 0
+    except excpt.HttpResponseError as e:
+        print(e.message)
+    except:
+        e = sys.exc_info()[0]
+        print(e)
+
     finally:
-        print("===================== Set Tier Successful =======================================")
         blob_client.close()
 
-    return set_tier_resp
+    return return_code
