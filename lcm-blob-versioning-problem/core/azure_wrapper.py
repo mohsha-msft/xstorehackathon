@@ -19,7 +19,7 @@ def account_url():
     return "https://" + storage_account + ".blob.core.windows.net/"
 
 
-# Method to set the connection string
+# Method to extract important info from connection string
 def set_credentials(_connection_string):
     protocol, account_name, account_key, endpoint = _connection_string.split(";")
     global storage_account
@@ -42,6 +42,7 @@ def set_credentials(_connection_string):
     connection_string = _connection_string
 
 
+# List all available version of a given blob
 def list_blob_versions(_container_name, relative_blob_path):
     container_client = ContainerClient.from_connection_string(
         container_name=_container_name,
@@ -61,15 +62,16 @@ def list_blob_versions(_container_name, relative_blob_path):
                 "blob_tier": resp["blob_tier"],
             }
             blob_versions.append(blob_version)
-            print(blob_version)
+            #print(blob_version)
 
     finally:
-        print("=====================Listing Successful =======================================")
+        #print("=====================Listing Successful =======================================")
         container_client.close()
 
     return blob_versions
 
 
+# Delete a specific version of a given bloob
 def delete_blob_version(_container_name, _relative_blob_path, _version_id):
     blob_client = BlobClient.from_connection_string(
         container_name=_container_name,
@@ -79,15 +81,16 @@ def delete_blob_version(_container_name, _relative_blob_path, _version_id):
 
     try:
         delete_resp = blob_client.delete_blob(version_id=_version_id)
-        print(delete_resp)
+        #print(delete_resp)
 
     finally:
-        print("=====================Delete Successful =======================================")
+        #print("=====================Delete Successful =======================================")
         blob_client.close()
 
     return delete_resp
 
 
+# Create a new version of given blob by uploading the file to that blob
 def add_blob_version(_container_name, _relative_blob_path, options):
     blob_client = BlobClient.from_connection_string(
         container_name=_container_name,
@@ -98,16 +101,17 @@ def add_blob_version(_container_name, _relative_blob_path, options):
     try:
         blob_data = open(options["file_path"], 'rb').read()
         upload_resp = blob_client.upload_blob(data=blob_data, blob_type=options["blob_type"], overwrite=True)
-        print(upload_resp)
+        #print(upload_resp)
 
     finally:
-        print("=====================New version Added Successful =======================================")
+        #print("=====================New version Added Successful =======================================")
         blob_client.close()
         # blob_data.close()
 
     return upload_resp
 
 
+# Get specific version of a blob and save contents to given file
 def download_blob_version(_container_name, _relative_blob_path, options):
     blob_client = BlobClient.from_connection_string(
         container_name=_container_name,
@@ -121,12 +125,13 @@ def download_blob_version(_container_name, _relative_blob_path, options):
         blob_data = open(options["file_path"], 'wb').write(content)
 
     finally:
-        print("=====================Download Successful =======================================")
+        #print("=====================Download Successful =======================================")
         blob_client.close()
 
     return download_resp.size
 
 
+# Delete all version of blob matching given dates
 def delete_blob_with_condition(_container_name, _relative_blob_path, options):
     blob_client = BlobClient.from_connection_string(
         container_name=_container_name,
@@ -156,12 +161,13 @@ def delete_blob_with_condition(_container_name, _relative_blob_path, options):
 
 
     finally:
-        print("=====================Delete Successful =======================================")
+        #print("=====================Delete Successful =======================================")
         blob_client.close()
 
     return delete_total_resp
 
 
+# Set tier of given version of a blob
 def blob_version_set_tier(_container_name, _relative_blob_path, options):
     blob_client = BlobClient.from_connection_string(
         container_name=_container_name,
