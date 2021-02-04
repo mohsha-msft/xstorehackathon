@@ -1,4 +1,4 @@
-#Storage Account Capacity Calculator
+# Storage Account Capacity Calculator
 
 ## Team - DevEx IDC
  - Vikas (Vikas.Bhansali@microsoft.com)
