@@ -59,23 +59,23 @@ optional arguments:
 ```
 
  ## Output 
- 
- ### Add version
- ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/create.png?raw=true)
- 
+
  ### List all versions of the given blob
  ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/list.png?raw=true)
- 
+
+ ### Add version
+ ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/create.png?raw=true)
+
+ ### Delete specific version
+ ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/delete.png?raw=true)
+
   ### Download specific version
  ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/download.png?raw=true)
  
    ### Set tier on a specific version
  ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/set_tier.png?raw=true)
  
- ### Delete specific version
- ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/delete.png?raw=true)
- 
-  ### Delete all version with last modified time greater than specified time (inclusive)
+   ### Delete all version with last modified time greater than specified time (inclusive)
  ![Add version](https://github.com/mohsha-msft/xstorehackathon/blob/devex-idc/lcm-blob-versioning-problem/lcm-blob-versioning-problem/output/delete_greater_than.png?raw=true)
  
   ### Delete all version with last modified time between specified start and end time (inclusive)
