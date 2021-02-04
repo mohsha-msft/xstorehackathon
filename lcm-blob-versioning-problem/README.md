@@ -13,9 +13,9 @@
     - Create new version by uploading a file
     - Download specific version to a local file
     - Update blob-tier of a specific version
-    - Delete all versions having last modified time older then a specific date
-    - Delete all versions having last modified time later then a specific date
-    - Delete all versions having last modified time between a date-time range
+    - Delete all versions created before a specific date-time
+    - Delete all versions created after a specific date-time
+    - Delete all versions created between a given date-time range
    
 ## Input
  
