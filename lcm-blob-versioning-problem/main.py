@@ -1,8 +1,11 @@
 import sys
+
 from core import azure_wrapper
 
 
 def main(argv):
+    container_name = "godeletespecificblobversionwithblobsas2935502929500"
+    blob_name = "anothertestblob"
     azure_wrapper.set_credentials(argv[0])
     # blob_version = azure_wrapper.list_blob_versions("godeletespecificblobversionwithblobsas2935502929500",
     #                                                 "gotestblobdeletespecificblobversionwithblobsas2938769234400")
@@ -66,6 +69,8 @@ def main(argv):
     #
     # blob_version = azure_wrapper.list_blob_versions("godeletespecificblobversionwithblobsas2935502929500",
     #                                                 "gotestblobdeletespecificblobversionwithblobsas2938769234400")
+
+    blob_version = azure_wrapper.generate_blob_with_versions(container_name, blob_name, 10, "BlockBlob")
 
 
 if __name__ == "__main__":
