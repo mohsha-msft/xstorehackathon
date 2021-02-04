@@ -7,9 +7,16 @@
  
  ## Input
  ```
-python main.py <connection string> <parallelism factor>
-     <connection string>  : MANDATORY : Connection string for the storage account 
-     <parallelism factor> : OPTIONAL  : Default to 8
+usage: main.py [-h] -s CONNECTION_STRING [-p PARALLEL_FACTOR]
+
+Capacitor : Count size of your storage
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s CONNECTION_STRING, --connection-string CONNECTION_STRING
+                        Connection string to the storage account
+  -p PARALLEL_FACTOR, --parallel-factor PARALLEL_FACTOR
+                        Parallel execution factor (OPTIONAL : default 8)
 ```
 
  ## Output 

@@ -1,3 +1,5 @@
+  
+import argparse
 import queue
 import sys
 import threading
@@ -177,20 +179,21 @@ def report_usage():
     print("----------------------------------------------------------------")
 
     file_share_stats.clear()
-    print("Capacitor is tired... bye bye !!!")
+    
 
 
 # ----------------------- Main processing --------------------------
-def main(argv):
+def main(cli_options):
     global MaxThreadCount
-    if len(argv) < 1:
-        print("Tool needs '<connection string> <number of parallel threads>` as argument")
-        exit()
 
-    if len(argv) == 2:
-        MaxThreadCount = int(argv[1])
+    if cli_options['connection_string']:
+            Azure.set_connection_string(cli_options['connection_string'])
+    else:
+        conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+        Azure.set_connection_string(conn_str)
 
-    Azure.set_connection_string(argv[0])
+    if cli_options['parallel_factor']:
+        MaxThreadCount = int(cli_options['parallel_factor'])
 
     # Get the list of containers from the storage account
     # Push them to queue for first level of iteration
@@ -226,4 +229,15 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+     # Construct the argument parser
+    arg_parser = argparse.ArgumentParser(description="Capacitor : Count size of your storage")
+
+    # Add the basic arguments to parser
+    arg_parser.add_argument("-s", "--connection-string",  required=True,
+                            help="Connection string to the storage account")
+    arg_parser.add_argument("-p", "--parallel-factor",
+                            help="Parallel execution factor")
+
+    cli_options = vars(arg_parser.parse_args())
+    main(cli_options)
+    print("Capacitor is tired... bye bye !!!")
