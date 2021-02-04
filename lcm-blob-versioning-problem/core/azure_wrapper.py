@@ -122,7 +122,6 @@ def add_blob_version(_container_name, _relative_blob_path, options):
     try:
         blob_data = open(options["file_path"], 'rb').read()
         upload_resp = blob_client.upload_blob(data=blob_data, blob_type=options["blob_type"], overwrite=True)
-        #print(upload_resp)
 
     finally:
         #print("=====================New version Added Successful =======================================")
@@ -165,23 +164,22 @@ def delete_blob_with_condition(_container_name, _relative_blob_path, options):
 
         if 'delete_before' in options:
             for blob_version in blob_versions:
-                if blob_version['last_modified'] <= options['delete_before']:
+                if blob_version['last_modified'] <= options['delete_before'] and blob_version['is_current_version'] is None:
                     delete_resp = blob_client.delete_blob(version_id=blob_version["version_id"])
-                    delete_total_resp.append(delete_resp)
+                    delete_total_resp.append(blob_version)
         if 'delete_after' in options:
             for blob_version in blob_versions:
-                if blob_version['last_modified'] >= options['delete_after']:
+                if blob_version['last_modified'] >= options['delete_after'] and blob_version['is_current_version'] is None:
                     delete_resp = blob_client.delete_blob(version_id=blob_version["version_id"])
-                    delete_total_resp.append(delete_resp)
+                    delete_total_resp.append(blob_version)
         if 'delete_between' in options:
             for blob_version in blob_versions:
-                if options['delete_between'][0] <= blob_version['last_modified'] <= options['delete_between'][1]:
+                if (options['delete_between'][0] <= blob_version['last_modified'] <= options['delete_between'][1]) \
+                        and blob_version['is_current_version'] is None:
                     delete_resp = blob_client.delete_blob(version_id=blob_version["version_id"])
-                    delete_total_resp.append(delete_resp)
-
+                    delete_total_resp.append(blob_version)
 
     finally:
-        #print("=====================Delete Successful =======================================")
         blob_client.close()
 
     return delete_total_resp
