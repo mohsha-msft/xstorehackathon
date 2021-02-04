@@ -182,9 +182,13 @@ def report_usage():
 
 # ----------------------- Main processing --------------------------
 def main(argv):
+    global MaxThreadCount
     if len(argv) < 1:
-        print("Provide connection string as input parameter")
+        print("Tool needs '<connection string> <number of parallel threads>` as argument")
         exit()
+
+    if len(argv) == 2:
+        MaxThreadCount = int(argv[1])
 
     Azure.set_connection_string(argv[0])
 

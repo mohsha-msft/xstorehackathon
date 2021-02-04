@@ -7,7 +7,9 @@
  
  ## Input
  ```
-python main.py <connection string to storage account>
+python main.py <connection string> <parallelism factor>
+     <connection string>  : MANDATORY : Connection string for the storage account 
+     <parallelism factor> : OPTIONAL  : Default to 8
 ```
 
  ## Output 
