@@ -5,6 +5,18 @@
  - Narasimha (narasimha.kulkarni@microsoft.com)
  - Mohit (mohsha@microsoft.com)
  
+## About the tool
+ - This tools provides extensive options for life cycle management of blob versions
+ - Below are list of features available 
+    - List all version of a blob
+    - Delete a specific version of a blob
+    - Create new version by uploading a file
+    - Download specific version to a local file
+    - Update blob-tier of a specific version
+    - Delete all versions having last modified time older then a specific date
+    - Delete all versions having last modified time later then a specific date
+    - Delete all versions having last modified time between a date-time range
+   
 ## Input
  
 Set connection string for the storage account as a part of environment variable: `AZURE_STORAGE_CONNECTION_STRING`
