@@ -187,7 +187,7 @@ def main(cli_options):
     global MaxThreadCount
 
     if cli_options['connection_string']:
-            Azure.set_connection_string(cli_options['connection_string'])
+        Azure.set_connection_string(cli_options['connection_string'])
     else:
         conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
         Azure.set_connection_string(conn_str)
