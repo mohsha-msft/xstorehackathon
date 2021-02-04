@@ -83,10 +83,10 @@ def list_blob_versions(_container_name, relative_blob_path):
                 "blob_tier": resp["blob_tier"],
             }
             blob_versions.append(blob_version)
-            #print(blob_version)
+            # print(blob_version)
 
     finally:
-        #print("=====================Listing Successful =======================================")
+        # print("=====================Listing Successful =======================================")
         container_client.close()
 
     return blob_versions
@@ -102,10 +102,10 @@ def delete_blob_version(_container_name, _relative_blob_path, _version_id):
 
     try:
         delete_resp = blob_client.delete_blob(version_id=_version_id)
-        #print(delete_resp)
+        # print(delete_resp)
 
     finally:
-        #print("=====================Delete Successful =======================================")
+        # print("=====================Delete Successful =======================================")
         blob_client.close()
 
     return delete_resp
@@ -124,7 +124,7 @@ def add_blob_version(_container_name, _relative_blob_path, options):
         upload_resp = blob_client.upload_blob(data=blob_data, blob_type=options["blob_type"], overwrite=True)
 
     finally:
-        #print("=====================New version Added Successful =======================================")
+        # print("=====================New version Added Successful =======================================")
         blob_client.close()
 
     return upload_resp
@@ -144,7 +144,7 @@ def download_blob_version(_container_name, _relative_blob_path, options):
         blob_data = open(options["file_path"], 'wb').write(content)
 
     finally:
-        #print("=====================Download Successful =======================================")
+        # print("=====================Download Successful =======================================")
         blob_client.close()
 
     return download_resp.size
@@ -164,12 +164,14 @@ def delete_blob_with_condition(_container_name, _relative_blob_path, options):
 
         if 'delete_before' in options:
             for blob_version in blob_versions:
-                if blob_version['last_modified'] <= options['delete_before'] and blob_version['is_current_version'] is None:
+                if blob_version['last_modified'] <= options['delete_before'] and blob_version[
+                    'is_current_version'] is None:
                     delete_resp = blob_client.delete_blob(version_id=blob_version["version_id"])
                     delete_total_resp.append(blob_version)
         if 'delete_after' in options:
             for blob_version in blob_versions:
-                if blob_version['last_modified'] >= options['delete_after'] and blob_version['is_current_version'] is None:
+                if blob_version['last_modified'] >= options['delete_after'] and blob_version[
+                    'is_current_version'] is None:
                     delete_resp = blob_client.delete_blob(version_id=blob_version["version_id"])
                     delete_total_resp.append(blob_version)
         if 'delete_between' in options:

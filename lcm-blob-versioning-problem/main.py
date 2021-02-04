@@ -3,7 +3,9 @@ import datetime as dt
 import os
 
 from core import azure_wrapper
+
 datetime_format = '%Y-%m-%d %H:%M:%S'
+
 
 def main(cli_options):
     if cli_options['connection_string']:
