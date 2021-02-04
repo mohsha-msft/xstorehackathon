@@ -1,3 +1,8 @@
+import datetime as dt
+import random
+import string
+import time
+
 from azure.storage.blob import (
     BlobServiceClient,
     BlobClient,
@@ -6,7 +11,6 @@ from azure.storage.blob import (
     AccountSasPermissions,
     ResourceTypes
 )
-import datetime as dt
 
 storage_account = ""
 storage_account_key = ""
@@ -42,7 +46,24 @@ def set_credentials(_connection_string):
     connection_string = _connection_string
 
 
-# List all available version of a given blob
+def generate_blob_with_versions(_container_name, _relative_blob_path, _number_of_versions, _blob_type):
+    blob_version = []
+    for i in range(0, _number_of_versions):
+        try:
+            time.sleep(2)
+            content = ''.join(random.choice(string.ascii_letters) for _ in range(random.randint(100, 10000))).encode()
+            file_path = "./sample_files/generate_random_blob_" + str(i + 1) + ".txt"
+            _ = open(file_path, 'wb').write(content)
+            options = {
+                "file_path": file_path,
+                "blob_type": "BlockBlob",
+            }
+            upload_resp = add_blob_version(_container_name, _relative_blob_path, options)
+            print(upload_resp)
+        finally:
+            print("=====================Generated Versions Successfully =======================================")
+
+
 def list_blob_versions(_container_name, relative_blob_path):
     container_client = ContainerClient.from_connection_string(
         container_name=_container_name,
@@ -106,7 +127,6 @@ def add_blob_version(_container_name, _relative_blob_path, options):
     finally:
         #print("=====================New version Added Successful =======================================")
         blob_client.close()
-        # blob_data.close()
 
     return upload_resp
 
@@ -178,14 +198,14 @@ def blob_version_set_tier(_container_name, _relative_blob_path, options):
     try:
         set_tier_resp = None
         if options["blob_type"] == "BlockBlob":
-            set_tier_resp = blob_client.set_standard_blob_tier(standard_blob_tier=options["tier"], version_id=options["version_id"])
+            set_tier_resp = blob_client.set_standard_blob_tier(standard_blob_tier=options["tier"],
+                                                               version_id=options["version_id"])
         elif options["blob_type"] == "PageBlob":
             set_tier_resp = blob_client.set_premium_page_blob_tier(premium_page_blob_tier=options["tier"],
-                                                               version_id=options["version_id"])
+                                                                   version_id=options["version_id"])
 
     finally:
         print("===================== Set Tier Successful =======================================")
         blob_client.close()
 
     return set_tier_resp
-
