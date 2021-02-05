@@ -1,11 +1,9 @@
-import os
-import sys
 import concurrent.futures
 
-BLOCK_SIZE = 4 * 1024 * 1024  # 16M block
+BLOCK_SIZE = 4 * 1024 * 1024  # 4M block
 
 
-def download_current_block(page_ranges, curr_page):
+def _download_current_block(page_ranges, curr_page):
     for page in page_ranges:
         if curr_page["end"] < page["start"]:
             return False
@@ -16,7 +14,7 @@ def download_current_block(page_ranges, curr_page):
     return False
 
 
-def upload_page(blob_client, start, bytes_arr, ):
+def _upload_page(blob_client, start, bytes_arr):
     upload = False
     for i in bytes_arr:
         if i != 0:
@@ -24,7 +22,7 @@ def upload_page(blob_client, start, bytes_arr, ):
             break
 
     if upload:
-        blob_client.upload_page(bytes_arr, start, len(bytes_arr))
+        blob_client._upload_page(bytes_arr, start, len(bytes_arr))
 
 
 def upload_page_blob(sas_url, source_path):
@@ -38,18 +36,19 @@ def upload_page_blob(sas_url, source_path):
     executor = concurrent.futures.ThreadPoolExecutor(128)
     start = 0
     while block := src_blob.read(BLOCK_SIZE):
-        executor.submit(upload_page, blob_client, start, block)
+        executor.submit(_upload_page, blob_client, start, block)
         start = start + BLOCK_SIZE
 
     executor.shutdown()
     src_blob.close()
 
 
-def download_range(blob_client, valid_pages, start, length):
-    if download_current_block(valid_pages, {"start": start, "end": start + BLOCK_SIZE}):
+def _download_range(blob_client, valid_pages, start, length):
+    if _download_current_block(valid_pages, {"start": start, "end": start + BLOCK_SIZE}):
         download_stream = blob_client.download_blob(start, length)
         return download_stream.readall()
     return bytearray(length)
+
 
 def download_page_blob(sas_url, destination_path):
     from azure.storage.blob import BlobClient
@@ -64,10 +63,10 @@ def download_page_blob(sas_url, destination_path):
     executor = concurrent.futures.ThreadPoolExecutor(128)
     futures = []
     while start < properties["size"]:
-        futures.append(executor.submit(download_range, blob_client, page_ranges, start, min(BLOCK_SIZE, properties["size"] - start +1 )))
+        futures.append(executor.submit(_download_range, blob_client, page_ranges, start,
+                                       min(BLOCK_SIZE, properties["size"] - start + 1)))
         start = start + BLOCK_SIZE
 
     for future in concurrent.futures.as_completed(futures):
         myblob.write(future.result())
     myblob.close()
-
