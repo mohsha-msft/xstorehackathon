@@ -1,5 +1,6 @@
 from azure.storage.blob import BlobServiceClient
 from azure.storage.fileshare import ShareServiceClient
+import azure.core.exceptions as excpt
 
 StorageAccountConnectionString = ""
 BlobServiceClientObj = None
