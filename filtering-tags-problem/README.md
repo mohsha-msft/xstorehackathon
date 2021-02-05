@@ -5,6 +5,17 @@
  - Narasimha (Narasimha.Kulkarni@microsoft.com)
  - Mohit (mohsha@microsoft.com)
  
+ ## About the tool
+  - This tool provides life cycle management of blob tags
+  - Below are the feature available in the tool
+      - List all the blobs matching given filter criteria
+      - Delete all blobs matching filter criteria
+      - Update any existing tag in all blobs matching filter criteria
+      - Delete specific tag from all the filtered blobs
+      - Remove existing tags and add a new tag to all filtered blobs
+      - Download all filtered blobs to given directory
+  
+
  ## Input
  ```
 usage: main.py [-h] [-lcs CONNECTION_STRING | -lsu SAS_URL]
@@ -48,8 +59,7 @@ optional arguments:
 `"a1+"='b-2'`
 
  ## Output 
- 
- ### Output of blob list
+ - Output of blob list
 ```
 Connected to pydev debugger (build 202.8194.22)
 {'name': 'bc.dat', 'container_name': 'testcontainer', 'tags': {'a1+': 'b-2'}}
