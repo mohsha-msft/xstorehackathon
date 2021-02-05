@@ -35,6 +35,7 @@ def main():
         }],
         "concurrency": cli_options["concurrency_factor"],
         "operation": parse_operation(),
+        "condition_file_path" : cli_options["condition-file-path"]
     }
 
     filtered_blobs = azure_wrapper.filter_blobs_by_tags(credentials, options)
