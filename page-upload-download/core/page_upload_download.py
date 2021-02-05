@@ -1,4 +1,5 @@
 import concurrent.futures
+from azure.storage.blob import BlobClient
 
 BLOCK_SIZE = 4 * 1024 * 1024  # 4M block
 
@@ -22,11 +23,17 @@ def _upload_page(blob_client, start, bytes_arr):
             break
 
     if upload:
-        blob_client._upload_page(bytes_arr, start, len(bytes_arr))
+        blob_client.upload_page(bytes_arr, start, len(bytes_arr))
+
+
+def _download_range(blob_client, valid_pages, start, length):
+    if _download_current_block(valid_pages, {"start": start, "end": start + BLOCK_SIZE}):
+        download_stream = blob_client.download_blob(start, length)
+        return download_stream.readall()
+    return bytearray(length)
 
 
 def upload_page_blob(sas_url, source_path):
-    from azure.storage.blob import BlobClient
     from pathlib import Path
 
     blob_client = BlobClient.from_blob_url(sas_url)
@@ -43,16 +50,7 @@ def upload_page_blob(sas_url, source_path):
     src_blob.close()
 
 
-def _download_range(blob_client, valid_pages, start, length):
-    if _download_current_block(valid_pages, {"start": start, "end": start + BLOCK_SIZE}):
-        download_stream = blob_client.download_blob(start, length)
-        return download_stream.readall()
-    return bytearray(length)
-
-
 def download_page_blob(sas_url, destination_path):
-    from azure.storage.blob import BlobClient
-
     blob_client = BlobClient.from_blob_url(sas_url)
     properties = blob_client.get_blob_properties()
     myblob = open(destination_path, "wb")
@@ -70,3 +68,25 @@ def download_page_blob(sas_url, destination_path):
     for future in concurrent.futures.as_completed(futures):
         myblob.write(future.result())
     myblob.close()
+
+
+def copy_page_from_url(src_sas, dst_sas):
+    src_client = BlobClient.from_blob_url(src_sas)
+    dst_client = BlobClient.from_blob_url(dst_sas)
+
+    src_props = src_client.get_blob_properties()
+    page_ranges = src_client.get_page_ranges(0, src_props["size"])[0]
+    dst_client.create_page_blob(src_props["size"])
+    executor = concurrent.futures.ThreadPoolExecutor(128)
+
+    for page in page_ranges:
+        start = page["start"]
+        end = page["end"]
+        while start < end:
+            executor.submit(dst_client.upload_pages_from_url, start, min(BLOCK_SIZE, end - start + 1), start)
+            start = start + BLOCK_SIZE
+
+    executor.shutdown()
+
+
+
