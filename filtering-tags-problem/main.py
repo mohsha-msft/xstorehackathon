@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     # Add the basic arguments to parser
     ex_group = arg_parser.add_mutually_exclusive_group()
-    ex_group.add_argument("-lcs", "--connection-string", help="Connection String for storage account")
+    ex_group.add_argument("-lcs", "--connection-string", help="Connection String for storage account", action="store_true")
     ex_group.add_argument("-lsu", "--sas-url", help="Service SAS URL for blob storage account")
 
     arg_parser.add_argument("-z", "--concurrency-factor",
