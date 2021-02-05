@@ -1,13 +1,14 @@
 def multiply_list(list, n):
     if list[0] == "":
         return []
-    
+
     if n == 0:
         return list
-    
+
     return [ele + "," for ele in list for _ in range(n)]
 
-#def create_filter_expression1(options):
+
+# def create_filter_expression1(options):
 #    filter_expressions = []
 
 #    filter_list_len = len(filter_expressions)
@@ -16,7 +17,7 @@ def multiply_list(list, n):
 #        for container in container_list:
 #            filter_expressions.append("@container = \'" + container.strip() + "\'")
 
-    
+
 #    filter_list_len = len(filter_expressions)
 #    if options["name_starts_with"]:
 #        name_filter_list = options["name_starts_with"].strip().split(",")
@@ -31,29 +32,36 @@ def multiply_list(list, n):
 #    return filter_expressions
 
 
-
 def create_filter_expression(options):
     filter_expressions = ""
 
-    if options["container"]:
-        filter_expressions = "@container='" + options["container"].strip() + "',"
-       
-#    if options["name_starts_with"]:
-#        filter_expressions += "\"Name\"='" + options["name_starts_with"].strip() + "'"
-        
-    
-    return filter_expressions
+    if options["container_name"] is not None:
+        filter_expressions = "@container='" + options["container_name"].strip() + "' AND "
 
+    #    if options["name_starts_with"]:
+    #        filter_expressions += "\"Name\"='" + options["name_starts_with"].strip() + "'"
+
+    try:
+        if options["condition_file_path"]:
+            expressions = open(options["condition_file_path"], 'r').readlines()
+            if len(expressions) == 0:
+                raise Exception("List empty")
+            filter_expressions += expressions[0]
+
+    except FileNotFoundError as err:
+        print(err)
+    except Exception as err:
+        print(err)
+    return filter_expressions
 
 
 if __name__ == "__main__":
     options = {}
-    #options["container"] = "con1, con2, con3"
-    #options["name_starts_with"] = "abc, def, xyz"
+    # options["container"] = "con1, con2, con3"
+    # options["name_starts_with"] = "abc, def, xyz"
 
     options["container"] = "con1"
     options["name_starts_with"] = "abc"
-
 
     expr_list = create_filter_expression(options)
     for expr in expr_list:
