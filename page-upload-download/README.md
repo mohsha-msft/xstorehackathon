@@ -1,4 +1,4 @@
-# Optimized Uploader/Downloader For Page Blob
+# Optimized Upload/Download/Copy Tool for Page Blob
 
 ## Team - DevEx IDC
  - Vikas (Vikas.Bhansali@microsoft.com)
@@ -45,11 +45,11 @@ optional arguments:
 
  ## Output 
  
- ![Upload](https://github.com/mohsha-msft/xstorehackathon/blob/nakulkar/page-upload-download/output/upload.png?raw=true)
+ ![Upload](https://github.com/mohsha-msft/xstorehackathon/blob/nakulkar/pageBlobRanges/page-upload-download/output/upload.png?raw=true)
  
- ![Download](https://github.com/mohsha-msft/xstorehackathon/blob/nakulkar/page-upload-download/output/download.png?raw=true)
+ ![Download](https://github.com/mohsha-msft/xstorehackathon/blob/nakulkar/pageBlobRanges/page-upload-download/output/download.png?raw=true)
 
- ![Copy](https://github.com/mohsha-msft/xstorehackathon/blob/nakulkar/page-upload-download/output/copy.png?raw=true)
+ ![Copy](https://github.com/mohsha-msft/xstorehackathon/blob/nakulkar/pageBlobRanges/page-upload-download/output/copy.png?raw=true)
 
 
 
