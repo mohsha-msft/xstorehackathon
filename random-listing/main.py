@@ -11,7 +11,7 @@ QueueItem = namedtuple("QueueItem", "Container Type ListPath")
 # Type : Block / Page
 
 # Info for each directory for block blob and each page for page blob
-DeletionQueue = namedtuple("DeletionQueue",
+OutputQueue = namedtuple("OutputQueue",
                            "Container BlobList")
 
 # Below is how to use the namedtuple
@@ -72,11 +72,11 @@ def thread_handler(thrId):
                 else:
                     file_count += 1
                     total_size += blob_info["size"]
-                    blob_path_list.append(blob_info["name"])
+                    blob_path_list.append(queue_item.Container + " : " + blob_info["name"])
                 blob_info.clear()
 
             if len(blob_path_list) > 0:
-                UsageSummary.put(DeletionQueue(Container=queue_item.Container, BlobList=blob_path_list))
+                UsageSummary.put(OutputQueue(Container=queue_item.Container, BlobList=blob_path_list))
 
         PendingList.task_done()
 
@@ -88,8 +88,15 @@ def thread_handler(thrId):
     MaxThreadCount -= 1
 
 
-def delete_batch():
+def dump_blob_names():
+    global cli_options
+
     Done = False
+    out_file = None
+    
+    if cli_options["output_file"] is not None:
+        out_file = open(cli_options["output_file"], "w") 
+
     while not Done:
         try:
             usage_item = UsageSummary.get(timeout=3)
@@ -99,9 +106,19 @@ def delete_batch():
             continue
 
         usage_item = UsageSummary.get()
-        print(usage_item.BlobList)
-        azure.delete_blob_batch(usage_item.Container, usage_item.BlobList)
+        #print(usage_item.BlobList)
+        if out_file:
+            out_file.write("\n".join(usage_item.BlobList))
+            out_file.flush()
+            print(".", end="")
+        else:
+            print("\n".join(usage_item.BlobList))
+
         UsageSummary.task_done()
+        
+
+    if out_file:
+        out_file.close()
 
 
 # ----------------------- Main processing --------------------------
@@ -132,7 +149,7 @@ def main(cli_options):
     # container_list.clear()
 
     # Start the thread to report the usage info
-    report_thread = threading.Thread(target=delete_batch)
+    report_thread = threading.Thread(target=dump_blob_names)
     report_thread.daemon = True
     report_thread.start()
 
@@ -159,6 +176,8 @@ if __name__ == "__main__":
                             help="Connection string to the storage account")
     arg_parser.add_argument("-p", "--parallel-factor",
                             help="Parallel execution factor")
+    arg_parser.add_argument("-f", "--output-file",
+                            help="File path to dump the list of blobs")
 
     cli_options = vars(arg_parser.parse_args())
     main(cli_options)

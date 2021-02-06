@@ -46,7 +46,8 @@ def list_storage_blobs(container, listpath):
         while True:
             result_page = next(blob_list_resp)
             items_on_page = list(result_page)
-            blob_list.extend(items_on_page)
+            if len(items_on_page) > 0:
+                blob_list.extend(items_on_page)
 
     except excpt.HttpResponseError as e:
         print(e.message)
