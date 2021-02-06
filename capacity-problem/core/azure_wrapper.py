@@ -40,23 +40,26 @@ def list_storage_containers():
 # List blobs from a given path
 def list_storage_blobs(container, listpath):
     blob_list = []
+    
     try:
         include_attr = ['metadata', 'uncommittedblobs', 'copy', 'deleted']
         blob_container_client = BlobServiceClientObj.get_container_client(container=container)
-        blob_list = blob_container_client.walk_blobs(name_starts_with=listpath, include=include_attr)
+        blob_list_resp = blob_container_client.walk_blobs(name_starts_with=listpath, include=include_attr).by_page()
 
-        # print("Returning blobs : " + str(len(blob_list)))
-        # for item in blob_list:
-        #    print(item)
-        #    print("-----------------------------------------------------------------------")
+        while True:
+            result_page = next(blob_list_resp)
+            items_on_page = list(result_page)
+            if len(items_on_page) > 0:
+                blob_list.extend(items_on_page)
 
     except excpt.HttpResponseError as e:
         print(e.message)
-        
-    except:
-        e = sys.exc_info()[0]
-        print(e)
-
+    except excpt.AzureError as err:
+        print(err)
+    except StopIteration as err:
+        pass
+    except Exception as err:
+        print(err)
     finally:
         blob_container_client.close()
 

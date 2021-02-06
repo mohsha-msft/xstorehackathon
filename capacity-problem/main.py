@@ -122,7 +122,10 @@ def size_calculator(thrId):
         IteratorLock.release()
 
     # print("Child " + str(thrId) + " exited : Dir " + str(total_path_processed))
+    IteratorLock.acquire()
     MaxThreadCount -= 1
+    IteratorLock.release()
+
 
 
 def report_usage():
@@ -137,13 +140,12 @@ def report_usage():
     Done = False
     while not Done:
         try:
-            usage_item = UsageSummary.get(timeout=3)
+            usage_item = UsageSummary.get(block=False, timeout=3)
         except:
             if MaxThreadCount == 0:
                 Done = True
             continue
 
-        usage_item = UsageSummary.get()
         if usage_item.Type == "Block":
             dir_count += usage_item.DirCount
             file_count += usage_item.FileCount
