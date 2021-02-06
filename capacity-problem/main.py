@@ -1,11 +1,10 @@
-  
 import argparse
 import queue
-import sys
+import os
 import threading
 from collections import namedtuple
 
-from core import azure_wrapper as Azure
+from core import azure_wrapper as azure
 
 # Queue item to be iterated by the thread pool
 QueueItem = namedtuple("QueueItem", "Container Type ListPath")
@@ -40,22 +39,20 @@ def size_calculator(thrId):
     global IterationRunning
     global MaxThreadCount
 
-    Done = False
+    done = False
 
     total_path_processed = 0
-    while not Done:
+    while not done:
         try:
             queue_item = PendingList.get(timeout=3)
         except:
             if PendingList.empty() and IterationRunning == 0:
-                Done = True
+                done = True
             continue
 
         IteratorLock.acquire()
         IterationRunning += 1
         IteratorLock.release()
-
-        # print("Iterating path : " + queue_item.Container + ":" + queue_item.ListPath)
 
         total_path_processed += 1
 
@@ -63,10 +60,10 @@ def size_calculator(thrId):
         file_count = 0
         total_size = 0
         if queue_item.Type == "Block":
-            blob_list = Azure.list_storage_blobs(queue_item.Container, queue_item.ListPath)
+            blob_list = azure.list_storage_blobs(queue_item.Container, queue_item.ListPath)
 
             for blob in blob_list:
-                blob_info = Azure.get_blob_info(blob)
+                blob_info = azure.get_blob_info(blob)
                 if blob_info["dir"]:
                     dir_count += 1
                     PendingList.put(QueueItem(Container=queue_item.Container, Type="Block", ListPath=blob_info["name"]))
@@ -121,11 +118,9 @@ def size_calculator(thrId):
         IterationRunning -= 1
         IteratorLock.release()
 
-    # print("Child " + str(thrId) + " exited : Dir " + str(total_path_processed))
     IteratorLock.acquire()
     MaxThreadCount -= 1
     IteratorLock.release()
-
 
 
 def report_usage():
@@ -137,13 +132,13 @@ def report_usage():
 
     total_size = 0
 
-    Done = False
-    while not Done:
+    done = False
+    while not done:
         try:
             usage_item = UsageSummary.get(block=False, timeout=3)
         except:
             if MaxThreadCount == 0:
-                Done = True
+                done = True
             continue
 
         if usage_item.Type == "Block":
@@ -160,7 +155,7 @@ def report_usage():
         UsageSummary.task_done()
 
     # Count the file share items separately
-    file_share_stats = Azure.list_file_shares()
+    file_share_stats = azure.list_file_shares()
     file_share_usage = 0
     for fileShareItem in file_share_stats:
         file_share_usage += file_share_stats[fileShareItem]
@@ -181,18 +176,17 @@ def report_usage():
     print("----------------------------------------------------------------")
 
     file_share_stats.clear()
-    
 
 
 # ----------------------- Main processing --------------------------
-def main(cli_options):
+def main():
     global MaxThreadCount
 
     if cli_options['connection_string']:
-        Azure.set_connection_string(cli_options['connection_string'])
+        azure.set_connection_string(cli_options['connection_string'])
     else:
         conn_str = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-        Azure.set_connection_string(conn_str)
+        azure.set_connection_string(conn_str)
 
     if cli_options['parallel_factor']:
         MaxThreadCount = int(cli_options['parallel_factor'])
@@ -200,7 +194,7 @@ def main(cli_options):
     # Get the list of containers from the storage account
     # Push them to queue for first level of iteration
     global TotalContainer
-    container_list = Azure.list_storage_containers()
+    container_list = azure.list_storage_containers()
     TotalContainer = len(container_list)
 
     if TotalContainer == 0:
@@ -231,15 +225,15 @@ def main(cli_options):
 
 
 if __name__ == "__main__":
-     # Construct the argument parser
+    # Construct the argument parser
     arg_parser = argparse.ArgumentParser(description="Capacitor : Count size of your storage")
 
     # Add the basic arguments to parser
-    arg_parser.add_argument("-s", "--connection-string",  required=True,
+    arg_parser.add_argument("-s", "--connection-string",
                             help="Connection string to the storage account")
     arg_parser.add_argument("-p", "--parallel-factor",
                             help="Parallel execution factor")
 
     cli_options = vars(arg_parser.parse_args())
-    main(cli_options)
+    main()
     print("Capacitor is tired... bye bye !!!")

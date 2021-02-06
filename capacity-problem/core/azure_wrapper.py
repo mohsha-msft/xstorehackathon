@@ -1,6 +1,6 @@
+import azure.core.exceptions as excpt
 from azure.storage.blob import BlobServiceClient
 from azure.storage.fileshare import ShareServiceClient
-import azure.core.exceptions as excpt
 
 StorageAccountConnectionString = ""
 BlobServiceClientObj = None
@@ -29,9 +29,9 @@ def list_storage_containers():
 
     except excpt.HttpResponseError as e:
         print(e.message)
-
-    except:
-        e = sys.exc_info()[0]
+    except excpt.AzureError as e:
+        print(e)
+    except Exception as e:
         print(e)
 
     return storage_container_list
@@ -40,7 +40,7 @@ def list_storage_containers():
 # List blobs from a given path
 def list_storage_blobs(container, listpath):
     blob_list = []
-    
+
     try:
         include_attr = ['metadata', 'uncommittedblobs', 'copy', 'deleted']
         blob_container_client = BlobServiceClientObj.get_container_client(container=container)
@@ -68,9 +68,8 @@ def list_storage_blobs(container, listpath):
 
 def list_file_shares():
     file_share_stats = {}
+    file_share_service_client = ShareServiceClient.from_connection_string(conn_str=StorageAccountConnectionString)
     try:
-        file_share_service_client = ShareServiceClient.from_connection_string(conn_str=StorageAccountConnectionString)
-
         file_shares = file_share_service_client.list_shares(include_metadata=True, include_snapshots=True)
 
         for share_obj in file_shares:
@@ -81,10 +80,10 @@ def list_file_shares():
             file_share_stats[share_obj.name] = share_stats
 
     except excpt.HttpResponseError as e:
-        print(e.message)
-        
-    except:
-        e = sys.exc_info()[0]
+        print(e)
+    except excpt.AzureError as e:
+        print(e)
+    except Exception as e:
         print(e)
 
     finally:
@@ -93,7 +92,7 @@ def list_file_shares():
     return file_share_stats
 
 
-# Convert blob data retrieved from stroage to a dictionary holding important values
+# Convert blob data retrieved from storage to a dictionary holding important values
 def get_blob_info(blob):
     blob_info = {"name": blob.name, "dir": False, "symlink": False}
 
@@ -112,8 +111,7 @@ def get_blob_info(blob):
             blob_info["tier"] = blob.blob_tier
             blob_info["type"] = blob.blob_type
 
-    except:
-        e = sys.exc_info()[0]
+    except Exception as e:
         print(e)
 
     return blob_info
