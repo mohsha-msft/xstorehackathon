@@ -2,6 +2,7 @@ import argparse
 import os
 import queue
 import threading
+import time
 from collections import namedtuple
 
 from core import azure_wrapper as azure
@@ -20,7 +21,7 @@ OutputQueue = namedtuple("OutputQueue",
 
 # List Containing pending iteration objects
 PendingList = queue.Queue()
-UsageSummary = queue.Queue()
+ListSummary = queue.Queue()
 
 StopProcessing = False
 InitialIterationDone = False
@@ -76,7 +77,7 @@ def thread_handler(thrId):
                 blob_info.clear()
 
             if len(blob_path_list) > 0:
-                UsageSummary.put(OutputQueue(Container=queue_item.Container, BlobList=blob_path_list))
+                ListSummary.put(OutputQueue(Container=queue_item.Container, BlobList=blob_path_list))
 
         PendingList.task_done()
 
@@ -85,7 +86,9 @@ def thread_handler(thrId):
         IteratorLock.release()
 
     # print("Child " + str(thrId) + " exited : Dir " + str(total_path_processed))
+    IteratorLock.acquire()
     MaxThreadCount -= 1
+    IteratorLock.release()
 
 
 def dump_blob_names():
@@ -99,22 +102,21 @@ def dump_blob_names():
 
     while not Done:
         try:
-            usage_item = UsageSummary.get(timeout=3)
+            usage_item = ListSummary.get(block=False, timeout=3)
         except:
             if MaxThreadCount == 0:
                 Done = True
             continue
-
-        usage_item = UsageSummary.get()
-        #print(usage_item.BlobList)
+        
         if out_file:
+            out_file.write("\n")
             out_file.write("\n".join(usage_item.BlobList))
             out_file.flush()
             print(".", end="")
         else:
             print("\n".join(usage_item.BlobList))
 
-        UsageSummary.task_done()
+        ListSummary.task_done()
         
 
     if out_file:
@@ -164,6 +166,9 @@ def main(cli_options):
     # StopProcessing = True
     for itr in IteratorPoolList:
         itr.join()
+
+    #.sleep(10)
+    #print("done")
     report_thread.join()
 
 
