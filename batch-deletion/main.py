@@ -85,20 +85,22 @@ def thread_handler(thrId):
         IteratorLock.release()
 
     # print("Child " + str(thrId) + " exited : Dir " + str(total_path_processed))
+    IteratorLock.acquire()
     MaxThreadCount -= 1
+    IteratorLock.release()
+
 
 
 def delete_batch():
     Done = False
     while not Done:
         try:
-            usage_item = UsageSummary.get(timeout=3)
+            usage_item = UsageSummary.get(block=False, timeout=3)
         except:
             if MaxThreadCount == 0:
                 Done = True
             continue
 
-        usage_item = UsageSummary.get()
         print(usage_item.BlobList)
         azure.delete_blob_batch(usage_item.Container, usage_item.BlobList)
         UsageSummary.task_done()
